@@ -1,19 +1,55 @@
 class Road{
+    static laneSpeed = 1;
+
     constructor(){
+        //the lanes that are a part of this road
         this.lanes = [];
-        this.lanes.push(new Lane(0));
+        
+
+        //how many lanes we begin with
+        let beginLanes = floor(HEIGHT / Lane.laneHeight) + 1;
+
+        this.lanes.push(new Lane(300));
+        for (let i = 0; i < beginLanes; i ++){
+            this.addLane();
+        }
+    }
+
+    //runs once per frame, checks various things that the road needds to keep track of
+    check(){
+        if (this.lanes[0].y > HEIGHT + Lane.laneHeight){
+            this.deleteLane();
+            this.addLane();
+        }
     }
 
     //draws the current road state to the screen
     display(){
-        push();
-        fill(120,120,120);
-        stroke(0, 0, 0);
-        strokeWeight(1);
-        rect(0,0,800, this.lanes.length * Lane.laneHeight);
-        for ( let i = 0; i < this.lanes.length - 1; i ++){
-            line(0, Lane.laneHeight * (i + 1), 800, Lane.laneHeight * (i + 1));
+        for ( let i = 0; i < this.lanes.length; i ++){
+            this.lanes[i].display();
         };
-        pop();
+    }
+
+    increment(){
+        for ( let i = 0; i < this.lanes.length; i ++){
+            this.lanes[i].y += Road.laneSpeed;
+        };
+    }
+
+    //adds a lane on top of the last lane in the road object
+    addLane(){
+        if (this.lanes.length < 1){
+            this.lanes.push(new Lane(0));
+        } else {
+            //y value of the last lane
+            let lastY = this.lanes[this.lanes.length - 1].y;
+
+            this.lanes.push(new Lane(lastY - Lane.laneHeight));
+        }
+    }
+
+    //deletes the "first" lane in the list
+    deleteLane(){
+        this.lanes.shift();
     }
 }
