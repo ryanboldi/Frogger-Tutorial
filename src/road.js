@@ -5,7 +5,6 @@ class Road{
         //the lanes that are a part of this road
         this.lanes = [];
         
-
         //how many lanes we begin with
         let beginLanes = floor(HEIGHT / Lane.laneHeight) + 1;
 
@@ -33,6 +32,7 @@ class Road{
     increment(){
         for ( let i = 0; i < this.lanes.length; i ++){
             this.lanes[i].y += Road.laneSpeed;
+            this.lanes[i].increment();
         };
     }
 
