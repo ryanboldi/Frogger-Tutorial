@@ -19,6 +19,11 @@ class Road{
         if (this.lanes[0].y > HEIGHT + Lane.laneHeight){
             this.deleteLane();
             this.addLane();
+            
+        }
+
+        for (let i = 0; i < this.lanes.length; i++){
+            this.lanes[i].check();
         }
     }
 

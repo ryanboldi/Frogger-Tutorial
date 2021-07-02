@@ -2,8 +2,8 @@ class Lane {
     static laneHeight = 100;
     static carSpeed = 1;
 
-    //0.5 + this value is the maximum fill of a lane
-    static carSpawnProbOffset = 0.45;
+    //0.4 + this value is the maximum fill of a lane
+    static carSpawnProbOffset = 0.40;
 
     /**
      * 
@@ -19,17 +19,8 @@ class Lane {
                 this.dir = 1;
             }
         } //-1 for left, 1 for right
-
-        this.cars = [];
-        //number of cars on lane to start with MAXIMUM
-        this.beginCars = WIDTH / (Car.carLength + Car.carGap); 
-        this.accCars = floor(this.beginCars * ((random()/2) + Lane.carSpawnProbOffset));
-
-        this.addGap = 0;
-
-        for (let i = 0; i < this.beginCars; i++){
-            this.tryAddCar();
-        }
+//
+        this.populate();
     }
 
     //draws the lane at the given y position
@@ -44,6 +35,22 @@ class Lane {
 
         for(let i = 0; i < this.cars.length; i++){
             this.cars[i].display(this.y);
+        }
+    }
+
+
+    //checks that all cars are on screen, if not, handles spawning
+    check(){
+        if (this.dir == 1){
+            if (this.cars[0].x - (Car.carLength/2) > WIDTH){
+                this.cars.push(new Car(this.cars[0].x - WIDTH - Car.carLength - Car.carGap));
+                this.deleteCar();
+            }
+        } else {
+            if (this.cars[0].x + (Car.carLength/2) < 0){
+                this.cars.push(new Car(this.cars[0].x + WIDTH + Car.carLength + Car.carGap));
+                this.deleteCar();
+            }
         }
     }
 
@@ -70,11 +77,48 @@ class Lane {
         }
     }
 
-    tryAddCar(){
-        if (random() < this.accCars/this.beginCars){
-            this.addCar();
-        } else {
-            this.addGap += Car.carLength + Car.carGap;
+    //will fill this lane up with a random amount of cars
+    populate(){
+        //empty array
+        this.cars = [];
+
+        //number of cars on lane to start with MAXIMUM
+        this.beginCars = WIDTH / (Car.carLength + Car.carGap); 
+
+        //actual number of cars in lane
+        this.accCars = floor(this.beginCars * ((random() * 0.4) + Lane.carSpawnProbOffset));
+
+        //space between laast placed car and this
+        this.addGap = 0;
+
+        //pick n random places to spawn cars
+        let picks = [];
+
+        while (picks.length < this.accCars){
+            //gives us a random spot in the lane
+            let ran = floor(random() * this.beginCars);
+            
+            //check that ran is not in picks
+            if (picks.includes(ran)){
+                break;
+            } else {
+                picks.push(ran);
+            }
+        }
+
+        picks.sort();
+        
+        //iterate through all picked indices
+        for (let i = 0; i < picks.length; i++){
+            //spawn the car at that position
+            //what is that position?
+            if (this.dir == -1){
+                //left
+                this.cars.push(new Car(picks[i] * (Car.carLength + Car.carGap)));
+            } else {
+                //right
+                this.cars.push(new Car(800 - (picks[i] * (Car.carLength + Car.carGap))));
+            }
         }
     }
 
